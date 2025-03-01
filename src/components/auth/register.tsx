@@ -47,80 +47,59 @@ export default function Register({
   const [showModal, setShowModal] = useState(false);
   const [message, showMessage] = useState(false);
 
+  const [isChecking, setIsChecking] = useState(false);
+  const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
   const urlCheckTimeout = useRef<NodeJS.Timeout>();
 
-  const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
-  const [isChecking, setIsChecking] = useState(false);
+  const checkUsernameAvailability = async (username: string) => {
+    try {
+      setIsChecking(true);
+      const { data, error } = await supabase
+        .from("ArtistSubmissions")
+        .select("uid")
+        .eq("uid", username)
+        .maybeSingle();
 
-  const urlCheckMutation = trpc.artistSubmissions.checkUrlAvailability.useQuery(
-    inputValue,
-    {
-      enabled: false,
-      onSuccess: (data) => {
-        console.log("URL check result:", data);
-        setIsChecking(false);
-        if ("error" in data) {
-          console.error("URL check error:", data.error);
-          setIsAvailable(null);
-        } else {
-          const available =
-            Object.keys(data).length === 0 || data.isAvailable === undefined
-              ? true
-              : data.isAvailable;
-          console.log("Username availability:", available);
-          setIsAvailable(available);
-        }
-      },
-      onError: (error) => {
-        console.error("URL check error:", error);
-        setIsChecking(false);
+      if (error) {
+        console.error("Error checking username:", error);
         setIsAvailable(null);
-      },
+        return;
+      }
+
+      // Username is available if no data is returned
+      setIsAvailable(!data);
+    } catch (err) {
+      console.error("Error in username check:", err);
+      setIsAvailable(null);
+    } finally {
+      setIsChecking(false);
     }
-  );
+  };
 
   useEffect(() => {
-    checkIfAllFilled();
-    onFormChange({
-      url: initialValue + inputValue,
-      inputVal_uid: inputValue,
-      name,
-      instagram,
-      spotify,
-      twitter,
-      genius,
-      bio,
-      styles,
-      imageUrl,
-    });
-  }, [
-    inputValue,
-    name,
-    instagram,
-    spotify,
-    twitter,
-    genius,
-    bio,
-    styles,
-    imageUrl,
-    step,
-  ]);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(initialValue, "");
-    setInputValue(value);
-
-    if (value.trim()) {
-      setIsChecking(true);
-      if (urlCheckTimeout.current) clearTimeout(urlCheckTimeout.current);
+    if (inputValue.trim()) {
+      if (urlCheckTimeout.current) {
+        clearTimeout(urlCheckTimeout.current);
+      }
+      
       urlCheckTimeout.current = setTimeout(() => {
-        console.log("Checking availability for:", value);
-        urlCheckMutation.refetch();
+        checkUsernameAvailability(inputValue);
       }, 300);
     } else {
       setIsChecking(false);
       setIsAvailable(null);
     }
+
+    return () => {
+      if (urlCheckTimeout.current) {
+        clearTimeout(urlCheckTimeout.current);
+      }
+    };
+  }, [inputValue]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(initialValue, "");
+    setInputValue(value);
   };
 
   const validateUrl = (value: string) => {
@@ -228,6 +207,60 @@ export default function Register({
     });
   }, [inputValue, isChecking, isAvailable]);
 
+  const renderAvailabilityStatus = () => {
+    if (!inputValue) return null;
+
+    return (
+      <div className="flex items-center ml-2">
+        {isChecking ? (
+          <div className="flex items-center">
+            <AiOutlineLoading3Quarters className="animate-spin text-2xl text-primary" />
+            <span className="text-primary text-sm ml-1">Checking...</span>
+          </div>
+        ) : isAvailable !== null ? (
+          isAvailable ? (
+            <div className="flex items-center">
+              <IoIosCheckmarkCircle className="text-3xl text-green-500" />
+              <span className="text-green-500 text-sm ml-1">Available</span>
+            </div>
+          ) : (
+            <div className="flex items-center">
+              <MdError className="text-3xl text-red-500" />
+              <span className="text-red-500 text-sm ml-1">Already taken</span>
+            </div>
+          )
+        ) : null}
+      </div>
+    );
+  };
+
+  useEffect(() => {
+    checkIfAllFilled();
+    onFormChange({
+      url: initialValue + inputValue,
+      inputVal_uid: inputValue,
+      name,
+      instagram,
+      spotify,
+      twitter,
+      genius,
+      bio,
+      styles,
+      imageUrl,
+    });
+  }, [
+    inputValue,
+    name,
+    instagram,
+    spotify,
+    twitter,
+    genius,
+    bio,
+    styles,
+    imageUrl,
+    step,
+  ]);
+
   return (
     <div>
       <Modal
@@ -268,27 +301,7 @@ export default function Register({
               value={inputValue}
               onChange={handleInputChange}
             />
-            {inputValue && (
-              <div className="flex items-center ml-2">
-                {isChecking ? (
-                  <AiOutlineLoading3Quarters className="animate-spin text-2xl text-primary" />
-                ) : isAvailable !== null ? (
-                  isAvailable ? (
-                    <div className="flex items-center">
-                      <IoIosCheckmarkCircle className="text-3xl text-green-500" />
-                      <span className="text-green-500 text-sm ml-1">
-                        Available
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center">
-                      <MdError className="text-3xl text-red-500" />
-                      <span className="text-red-500 text-sm ml-1">Taken</span>
-                    </div>
-                  )
-                ) : null}
-              </div>
-            )}
+            {renderAvailabilityStatus()}
           </div>
         </div>
         {message && (
