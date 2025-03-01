@@ -548,7 +548,6 @@
 // //     },
 // //   };
 // // };
-
 import supabase from "../../utils/supabase";
 import { trpc } from "../../utils/trpc";
 import { PlayCircleIcon, PauseCircleIcon } from "@heroicons/react/20/solid";
@@ -1140,46 +1139,72 @@ const Home: NextLayoutPage = () => {
   return (
     <div>
       <Head>
-        <title>{artistSubmission?.name || 'Stems'} - Music Creating Platform</title>
-        
+        <title>
+          {artistSubmission?.name || "Stems"} - Music Creating Platform
+        </title>
         {/* Essential Meta Tags */}
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta charSet="utf-8" />
-        <meta name="theme-color" content="#927FF5" />
-        
+        <meta name="theme-color" content="#2ecc71" />{" "}
+        {/* Match the preview link color */}
         {/* Open Graph / Facebook */}
-        <meta property="og:type" content="profile" />
+        <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Stems" />
-        <meta property="og:url" content={`${process.env.NEXT_PUBLIC_SITE_URL}/${artist}`} />
-        <meta 
-          property="og:title" 
-          content={`${artistSubmission?.name || 'Artist'} | Stems`}
+        <meta
+          property="og:url"
+          content={`${process.env.NEXT_PUBLIC_SITE_URL}/${artist}`}
+        />
+        <meta
+          property="og:title"
+          content={`${
+            artistSubmission?.name || "Stems"
+          } | Music Collaboration Platform`}
         />
         <meta
           property="og:description"
-          content={artistSubmission?.description || artistSubmission?.bio || `Submit your beats directly to ${artistSubmission?.name || 'the artist'}. Connect and collaborate on Stems, the platform connecting artists worldwide.`}
+          content={
+            artistSubmission?.description ||
+            artistSubmission?.bio ||
+            `Submit your beats directly to ${
+              artistSubmission?.name || "top artists"
+            }. Connect, collaborate, and let fans vote on Stems, the ultimate music creation platform.`
+          }
         />
         <meta
           property="og:image"
           content={
             artistSubmission?.ArtistSubmissionsSocials?.imageUrl ||
-            "https://0xstems.xyz/assets/og-image.png"
+            "https://vggefailroiumcklfbxv.supabase.co/storage/v1/object/public/profile-images/bb2003f0f2d06e4f1c57bf98a7f96bce.jpg"
           }
         />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-
+        <meta
+          property="og:image:alt"
+          content={`${artistSubmission?.name || "Stems"} Profile`}
+        />
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@stems" />
-        <meta property="twitter:url" content={`${process.env.NEXT_PUBLIC_SITE_URL}/${artist}`} />
-        <meta 
-          name="twitter:title" 
-          content={`${artistSubmission?.name || 'Artist'} | Stems`}
+        <meta
+          property="twitter:url"
+          content={`${process.env.NEXT_PUBLIC_SITE_URL}/${artist}`}
+        />
+        <meta
+          name="twitter:title"
+          content={`${
+            artistSubmission?.name || "Stems"
+          } | Music Collaboration Platform`}
         />
         <meta
           name="twitter:description"
-          content={artistSubmission?.description || artistSubmission?.bio || `Submit your beats directly to ${artistSubmission?.name || 'the artist'}. Connect and collaborate on Stems, the platform connecting artists worldwide.`}
+          content={
+            artistSubmission?.description ||
+            artistSubmission?.bio ||
+            `Submit your beats directly to ${
+              artistSubmission?.name || "top artists"
+            }. Connect, collaborate, and let fans vote on Stems, the ultimate music creation platform.`
+          }
         />
         <meta
           name="twitter:image"
@@ -1188,13 +1213,23 @@ const Home: NextLayoutPage = () => {
             "https://0xstems.xyz/assets/og-image.png"
           }
         />
-
+        <meta
+          name="twitter:image:alt"
+          content={`${artistSubmission?.name || "Stems"} Profile`}
+        />
         {/* Additional SEO */}
-        <meta 
-          name="description" 
-          content={artistSubmission?.description || artistSubmission?.bio || `Submit your beats directly to ${artistSubmission?.name || 'the artist'}. Connect and collaborate on Stems, the platform connecting artists worldwide.`}
+        <meta
+          name="description"
+          content={
+            artistSubmission?.description ||
+            artistSubmission?.bio ||
+            `Submit your beats directly to ${
+              artistSubmission?.name || "top artists"
+            }. Connect and collaborate on Stems, the platform connecting artists worldwide.`
+          }
         />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/favicon.ico" />
       </Head>
       {rendered && artistSubmission && !isLoading && (
         //ADDED TRACKS - passing tracks to the provider
@@ -1210,11 +1245,17 @@ const Home: NextLayoutPage = () => {
               name={artistSubmission.name}
               description={artistSubmission.description}
               socials={{
-                imageUrl: artistSubmission.ArtistSubmissionsSocials?.imageUrl || null,
-                spotifyUrl: artistSubmission.ArtistSubmissionsSocials?.spotifyUrl || null,
-                twitterUrl: artistSubmission.ArtistSubmissionsSocials?.twitterUrl || null,
-                instagramUrl: artistSubmission.ArtistSubmissionsSocials?.instagramUrl || null,
-                geniusUrl: artistSubmission.ArtistSubmissionsSocials?.geniusUrl || null
+                imageUrl:
+                  artistSubmission.ArtistSubmissionsSocials?.imageUrl || null,
+                spotifyUrl:
+                  artistSubmission.ArtistSubmissionsSocials?.spotifyUrl || null,
+                twitterUrl:
+                  artistSubmission.ArtistSubmissionsSocials?.twitterUrl || null,
+                instagramUrl:
+                  artistSubmission.ArtistSubmissionsSocials?.instagramUrl ||
+                  null,
+                geniusUrl:
+                  artistSubmission.ArtistSubmissionsSocials?.geniusUrl || null,
               }}
               bio={artistSubmission.bio}
             />
