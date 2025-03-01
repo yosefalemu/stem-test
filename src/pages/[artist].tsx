@@ -1146,12 +1146,12 @@ const Home: NextLayoutPage = () => {
         <meta charSet="utf-8" />
         
         {/* Open Graph / Facebook / WhatsApp */}
-        <meta property="og:type" content="profile" />
+        <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Stems" />
         <meta property="og:url" content={`${process.env.NEXT_PUBLIC_SITE_URL}/${artist}`} />
         <meta 
           property="og:title" 
-          content={artistSubmission?.name || "Artist on Stems"}
+          content={`${artistSubmission?.name || "Artist"} on Stems`}
         />
         <meta
           property="og:description"
@@ -1164,18 +1164,13 @@ const Home: NextLayoutPage = () => {
             "https://vggefailroiumcklfbxv.supabase.co/storage/v1/object/public/profile-images/bb2003f0f2d06e4f1c57bf98a7f96bce.jpg"
           }
         />
-        <meta property="og:image:width" content="400" />
-        <meta property="og:image:height" content="400" />
-        <meta property="og:image:alt" content={`${artistSubmission?.name}'s profile on Stems`} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         
-        {/* WhatsApp specific */}
-        <meta property="og:image:type" content="image/jpeg" />
-        <meta property="og:locale" content="en_US" />
-        
-        {/* Twitter Card - Fallback */}
-        <meta name="twitter:card" content="summary" />
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@stems" />
-        <meta name="twitter:title" content={artistSubmission?.name || "Artist on Stems"} />
+        <meta name="twitter:title" content={`${artistSubmission?.name || "Artist"} on Stems`} />
         <meta 
           name="twitter:description" 
           content={artistSubmission?.description || artistSubmission?.bio || `Send beats directly to ${artistSubmission?.name || 'the artist'} on Stems`}
