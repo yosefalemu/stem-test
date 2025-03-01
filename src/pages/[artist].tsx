@@ -1142,52 +1142,39 @@ const Home: NextLayoutPage = () => {
         <title>{artistSubmission?.name || "Stems"} - Music Creating Platform</title>
         
         {/* Essential Meta Tags */}
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#927FF5" />
+        
+        {/* Primary Meta Tags */}
+        <meta name="title" content={`${artistSubmission?.name || "Artist"} on Stems`} />
+        <meta
+          name="description"
+          content={artistSubmission?.description || artistSubmission?.bio || `Send beats directly to ${artistSubmission?.name || 'the artist'} on Stems`}
+        />
         
         {/* Open Graph / Facebook / WhatsApp */}
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Stems" />
         <meta property="og:url" content={`${process.env.NEXT_PUBLIC_SITE_URL}/${artist}`} />
-        <meta 
-          property="og:title" 
-          content={`${artistSubmission?.name || "Artist"} on Stems`}
-        />
-        <meta
-          property="og:description"
-          content={artistSubmission?.description || artistSubmission?.bio || `Send beats directly to ${artistSubmission?.name || 'the artist'} on Stems`}
-        />
-        <meta
-          property="og:image"
-          content={
-            artistSubmission?.ArtistSubmissionsSocials?.imageUrl ||
-            "https://vggefailroiumcklfbxv.supabase.co/storage/v1/object/public/profile-images/bb2003f0f2d06e4f1c57bf98a7f96bce.jpg"
-          }
-        />
+        <meta property="og:title" content={`${artistSubmission?.name || "Artist"} on Stems`} />
+        <meta property="og:description" content={artistSubmission?.description || artistSubmission?.bio || `Send beats directly to ${artistSubmission?.name || 'the artist'} on Stems`} />
+        <meta property="og:image" content={artistSubmission?.ArtistSubmissionsSocials?.imageUrl || "https://vggefailroiumcklfbxv.supabase.co/storage/v1/object/public/profile-images/bb2003f0f2d06e4f1c57bf98a7f96bce.jpg"} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={`${artistSubmission?.name || "Artist"}'s profile on Stems`} />
+        <meta property="og:locale" content="en_US" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@stems" />
+        <meta name="twitter:creator" content="@stems" />
         <meta name="twitter:title" content={`${artistSubmission?.name || "Artist"} on Stems`} />
-        <meta 
-          name="twitter:description" 
-          content={artistSubmission?.description || artistSubmission?.bio || `Send beats directly to ${artistSubmission?.name || 'the artist'} on Stems`}
-        />
-        <meta
-          name="twitter:image"
-          content={
-            artistSubmission?.ArtistSubmissionsSocials?.imageUrl ||
-            "https://vggefailroiumcklfbxv.supabase.co/storage/v1/object/public/profile-images/bb2003f0f2d06e4f1c57bf98a7f96bce.jpg"
-          }
-        />
+        <meta name="twitter:description" content={artistSubmission?.description || artistSubmission?.bio || `Send beats directly to ${artistSubmission?.name || 'the artist'} on Stems`} />
+        <meta name="twitter:image" content={artistSubmission?.ArtistSubmissionsSocials?.imageUrl || "https://vggefailroiumcklfbxv.supabase.co/storage/v1/object/public/profile-images/bb2003f0f2d06e4f1c57bf98a7f96bce.jpg"} />
         
-        {/* Additional SEO */}
-        <meta
-          name="description"
-          content={artistSubmission?.description || artistSubmission?.bio || `Send beats directly to ${artistSubmission?.name || 'the artist'} on Stems`}
-        />
+        {/* Canonical URL */}
+        <link rel="canonical" href={`${process.env.NEXT_PUBLIC_SITE_URL}/${artist}`} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {rendered && artistSubmission && !isLoading && (
