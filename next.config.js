@@ -5,7 +5,14 @@ const nextConfig = {
       "bbafbtqycmgvlyungeqn.supabase.co",
       "vggefailroiumcklfbxv.supabase.co"
     ],
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60,
   },
+  env: {
+    NEXT_PUBLIC_SITE_URL: 'https://stem-phi.vercel.app',
+  },
+  // Enable static exports for better social media preview
+  output: 'standalone',
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,

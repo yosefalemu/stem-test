@@ -1142,16 +1142,22 @@ const Home: NextLayoutPage = () => {
       <Head>
         <title>{artistSubmission?.name || 'Stems'} - Music Creating Platform</title>
         
+        {/* Essential Meta Tags */}
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta charSet="utf-8" />
+        <meta name="theme-color" content="#927FF5" />
+        
         {/* Open Graph / Facebook */}
-        <meta property="og:type" content="website" />
+        <meta property="og:type" content="profile" />
+        <meta property="og:site_name" content="Stems" />
         <meta property="og:url" content={`${process.env.NEXT_PUBLIC_SITE_URL}/${artist}`} />
         <meta 
           property="og:title" 
-          content={`${artistSubmission?.name || 'Artist'} on Stems - Send Beats Directly`} 
+          content={`${artistSubmission?.name || 'Artist'} | Stems`}
         />
         <meta
           property="og:description"
-          content={artistSubmission?.description || `Submit your beats directly to ${artistSubmission?.name || 'the artist'} and let fans vote on their favorite submissions. Join Stems, the music creation platform connecting artists worldwide.`}
+          content={artistSubmission?.description || artistSubmission?.bio || `Submit your beats directly to ${artistSubmission?.name || 'the artist'}. Connect and collaborate on Stems, the platform connecting artists worldwide.`}
         />
         <meta
           property="og:image"
@@ -1160,28 +1166,34 @@ const Home: NextLayoutPage = () => {
             "https://0xstems.xyz/assets/og-image.png"
           }
         />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
 
         {/* Twitter */}
-        <meta property="twitter:card" content="summary_large_image" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@stems" />
         <meta property="twitter:url" content={`${process.env.NEXT_PUBLIC_SITE_URL}/${artist}`} />
         <meta 
-          property="twitter:title" 
-          content={`${artistSubmission?.name || 'Artist'} on Stems - Send Beats Directly`} 
+          name="twitter:title" 
+          content={`${artistSubmission?.name || 'Artist'} | Stems`}
         />
         <meta
-          property="twitter:description"
-          content={artistSubmission?.description || `Submit your beats directly to ${artistSubmission?.name || 'the artist'} and let fans vote on their favorite submissions. Join Stems, the music creation platform connecting artists worldwide.`}
+          name="twitter:description"
+          content={artistSubmission?.description || artistSubmission?.bio || `Submit your beats directly to ${artistSubmission?.name || 'the artist'}. Connect and collaborate on Stems, the platform connecting artists worldwide.`}
         />
         <meta
-          property="twitter:image"
+          name="twitter:image"
           content={
             artistSubmission?.ArtistSubmissionsSocials?.imageUrl ||
             "https://0xstems.xyz/assets/og-image.png"
           }
         />
 
-        {/* Additional Meta Tags */}
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {/* Additional SEO */}
+        <meta 
+          name="description" 
+          content={artistSubmission?.description || artistSubmission?.bio || `Submit your beats directly to ${artistSubmission?.name || 'the artist'}. Connect and collaborate on Stems, the platform connecting artists worldwide.`}
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {rendered && artistSubmission && !isLoading && (
