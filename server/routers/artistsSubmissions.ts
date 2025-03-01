@@ -62,9 +62,14 @@ export const artistSubmissionsRouter = router({
       console.log("Checking availability for:", input); // Log the input
       try {
         const prisma = ctx.prisma;
-        // await prisma.$connect(); // Ensure the connection is established
-        const existingSubmission = await prisma.artistSubmissions.findUnique({
-          where: { uid: input },
+        // Check for case-insensitive match
+        const existingSubmission = await prisma.artistSubmissions.findFirst({
+          where: {
+            uid: {
+              mode: 'insensitive',
+              equals: input
+            }
+          },
           select: { uid: true },
         });
 
@@ -76,7 +81,6 @@ export const artistSubmissionsRouter = router({
           });
         }
         
-
         console.log("Existing submission:", existingSubmission); // Log the result
         return { isAvailable: !existingSubmission };
       } catch (err) {

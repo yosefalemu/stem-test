@@ -11,7 +11,9 @@ if (process.env.NODE_ENV === "production") {
 } else {
   console.log("DEV");
   if (!global.prisma) {
-    global.supabase = createClient(supabaseURL, supabaseKey);
+    global.supabase = createClient(supabaseURL, supabaseKey, {
+      auth: { persistSession: true },
+    });
   }
   supabase = global.supabase;
 }

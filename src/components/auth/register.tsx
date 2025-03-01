@@ -11,9 +11,9 @@ import { trpc } from "@utils/trpc";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useState, useEffect, useRef } from "react";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { IoIosCheckmarkCircle } from "react-icons/io";
 import { MdError } from "react-icons/md";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 export default function Register({
   formState,
@@ -63,7 +63,10 @@ export default function Register({
           console.error("URL check error:", data.error);
           setIsAvailable(null);
         } else {
-          const available = Object.keys(data).length === 0 || data.isAvailable === undefined ? true : data.isAvailable;
+          const available =
+            Object.keys(data).length === 0 || data.isAvailable === undefined
+              ? true
+              : data.isAvailable;
           console.log("Username availability:", available);
           setIsAvailable(available);
         }
@@ -106,7 +109,7 @@ export default function Register({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(initialValue, "");
     setInputValue(value);
-    
+
     if (value.trim()) {
       setIsChecking(true);
       if (urlCheckTimeout.current) clearTimeout(urlCheckTimeout.current);
@@ -127,8 +130,18 @@ export default function Register({
 
   const handleUpload = async (file: File, previewUrl: string) => {
     try {
-      setImageUrl(previewUrl);
-      onFormChange({ ...formState, imageUrl: previewUrl });
+      const { data, error } = await supabase.storage
+        .from("profile-images")
+        .upload(file.name, file);
+      if (error) {
+        console.error("Error uploading file:", error);
+        return;
+      }
+      const { data: urlData } = supabase.storage
+        .from("profile-images")
+        .getPublicUrl(data.path);
+      setImageUrl(urlData.publicUrl);
+      onFormChange({ ...formState, imageUrl: urlData.publicUrl });
     } catch (error) {
       console.error("Error uploading file:", error);
     }
@@ -263,7 +276,9 @@ export default function Register({
                   isAvailable ? (
                     <div className="flex items-center">
                       <IoIosCheckmarkCircle className="text-3xl text-green-500" />
-                      <span className="text-green-500 text-sm ml-1">Available</span>
+                      <span className="text-green-500 text-sm ml-1">
+                        Available
+                      </span>
                     </div>
                   ) : (
                     <div className="flex items-center">

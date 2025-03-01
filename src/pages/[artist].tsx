@@ -1,5 +1,5 @@
-"use client"
-import { trpc } from '../../utils/trpc';
+"use client";
+
 // import InstagramIcon from "../../public/logos/instagram.svg";
 // import SpotifyIcon from "../../public/logos/spotify.svg";
 // import TwitterIcon from "../../public/logos/twitter.svg";
@@ -210,7 +210,10 @@ import { trpc } from '../../utils/trpc';
 //         <div className="flex items-center w-full">
 //           <button
 //             className="cursor-pointer rounded-full md:hover:opacity-80"
-//             onClick={() => playPause(trackId)}
+//             onClick={(e) => {
+//               e.stopPropagation();
+//               playPause(trackId);
+//             }}
 //           >
 //             {isPlaying() && trackId === getCurrentTrack()?.id ? (
 //               <PauseCircleIcon className="w-12 h-12 md:w-10 md:h-10" />
@@ -303,7 +306,7 @@ import { trpc } from '../../utils/trpc';
 //             >
 //               Submissions
 //             </TabsPrimitive.Trigger>
-//             {/* 
+//             {/*
 //             <TabsPrimitive.Trigger
 //               value="demos"
 //               className="px-2 py-2 tab md:hover:opacity-80 text-gray-400"
@@ -547,6 +550,7 @@ import { trpc } from '../../utils/trpc';
 // // };
 
 import supabase from "../../utils/supabase";
+import { trpc } from "../../utils/trpc";
 import { PlayCircleIcon, PauseCircleIcon } from "@heroicons/react/20/solid";
 import useWindowSize from "@hooks/use-window-size";
 import * as Progress from "@radix-ui/react-progress";
@@ -583,28 +587,28 @@ import {
   BsTriangleFill,
 } from "react-icons/bs";
 import { OfferPopup } from "~/components/OfferPopup";
+import TestPlayerNew from "~/components/TestPlayerNew";
 import Layout, { SimpleLayout } from "~/components/layout";
 import HoverCardDemo from "~/components/shared/HoverCard";
 import { CopyLink, WebShare } from "~/components/shared/share";
 import Header from "~/components/soundRace/Header";
-import TestPlayerNew from "~/components/TestPlayerNew";
 
 const MusicPlayerComponent = dynamic(() => import("~/components/testplayer"), {
   ssr: false,
 });
 
 type ArtistSubmission = {
-    name: string;
-    description: string;
-    bio: string;
-    ArtistSubmissionsSocials: {
-      imageUrl: string | null;
-      spotifyUrl: string | null;
-      twitterUrl: string | null;
-      instagramUrl: string | null;
-      geniusUrl: string | null;
-    };
+  name: string;
+  description: string;
+  bio: string;
+  ArtistSubmissionsSocials: {
+    imageUrl: string | null;
+    spotifyUrl: string | null;
+    twitterUrl: string | null;
+    instagramUrl: string | null;
+    geniusUrl: string | null;
   };
+};
 
 function fmtMSS(s: number) {
   return (s - (s %= 60)) / 60 + (9 < s ? ":" : ":0") + s;
@@ -640,11 +644,13 @@ const Banner = ({ artistName }: { artistName?: string }) => {
     >
       <Marquee gradient={false} speed={40}>
         <div className="flex gap-16">
-          <div className="ml-16"> Send a beat directly to {artistName || 'the artist'}! </div>
-          <div> Send a beat directly to {artistName || 'the artist'}! </div>
-          <div> Send a beat directly to {artistName || 'the artist'}! </div>
-          <div> Send a beat directly to {artistName || 'the artist'}! </div>
-          <div> Send a beat directly to {artistName || 'the artist'}! </div>
+          <div className="ml-16">
+            Send a beat directly to {artistName || "the artist"}!
+          </div>
+          <div>Send a beat directly to {artistName || "the artist"}!</div>
+          <div>Send a beat directly to {artistName || "the artist"}!</div>
+          <div>Send a beat directly to {artistName || "the artist"}!</div>
+          <div>Send a beat directly to {artistName || "the artist"}!</div>
         </div>
       </Marquee>
     </div>
@@ -769,8 +775,8 @@ const Track = ({ trackId, title, liked, audioSrc, artist }: TrackProps) => {
           <div
             className="cursor-pointer rounded-full md:hover:opacity-80"
             onClick={(e) => {
-                e.stopPropagation();
-                playPause(trackId);
+              e.stopPropagation();
+              playPause(trackId);
             }}
           >
             {isPlaying() && trackId === getCurrentTrack()?.id ? (
@@ -816,7 +822,10 @@ const Track = ({ trackId, title, liked, audioSrc, artist }: TrackProps) => {
                 {isMobile ? (
                   <WebShare size={20} trackId={trackId} />
                 ) : (
-                  <div onClick={() => shareTrack(trackId)} className="flex items-center justify-center">
+                  <div
+                    onClick={() => shareTrack(trackId)}
+                    className="flex items-center justify-center"
+                  >
                     {" "}
                     <CopyLink trackId={trackId} />
                   </div>
@@ -843,7 +852,10 @@ const Track = ({ trackId, title, liked, audioSrc, artist }: TrackProps) => {
 };
 
 const Tracks = ({ tracks }: { tracks: any[] }) => {
-  const [sortBy, setSortBy] = useState({ base: SortBy.points, direction: SortDirection.desc });
+  const [sortBy, setSortBy] = useState({
+    base: SortBy.points,
+    direction: SortDirection.desc,
+  });
   const [isDemo, setIsDemo] = useState(false);
 
   const sortTracks = (tracksToSort: any[], base: string, direction: string) => {
@@ -866,7 +878,9 @@ const Tracks = ({ tracks }: { tracks: any[] }) => {
 
   const getUnInteractedTracks = () => {
     return sortTracks(
-      tracks.filter((track) => !track.liked && !track.isInspiration && !track.isDemo),
+      tracks.filter(
+        (track) => !track.liked && !track.isInspiration && !track.isDemo
+      ),
       sortBy.base,
       sortBy.direction
     );
@@ -1046,126 +1060,161 @@ const Tracks = ({ tracks }: { tracks: any[] }) => {
 };
 
 const Home: NextLayoutPage = () => {
-    const router = useRouter();
-    const { artist } = router.query;
-    
-    const [rendered, setRendered] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [artistSubmission, setArtistSubmission] = useState<ArtistSubmission | null>(null);
-    const [tracks, setTracks] = useState(null);
+  const router = useRouter();
+  const { artist } = router.query;
 
-    // const { data: artistSubmission, isLoading, error } = trpc.artistSubmissions.getArtistSubmissions.useQuery(
-    //   artist as string,
-    //   { enabled: !!artist }
-    // );
+  const [rendered, setRendered] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [artistSubmission, setArtistSubmission] =
+    useState<ArtistSubmission | null>(null);
+  const [tracks, setTracks] = useState(null);
 
-    const getUserData = async () => {
-        setIsLoading(true);
-      
-        const { data: artistData, error: artistError } = await supabase
-            .from('ArtistSubmissions')
-            .select('*')
-            .eq('uid', artist as string)
-            .single();
+  // const { data: artistSubmission, isLoading, error } = trpc.artistSubmissions.getArtistSubmissions.useQuery(
+  //   artist as string,
+  //   { enabled: !!artist }
+  // );
 
+  const getUserData = async () => {
+    setIsLoading(true);
 
-        if (artistError) {
-          //@ts-ignore
-          setError(artistError.message);
-          setIsLoading(false);
-          return;
-        }
-      
-        const { data: tracksData, error: tracksError } = await supabase
-          .from('Track')
-          .select('*')
-          .eq('artistSubmissionId', artist as string);
-      
-        if (tracksError) {
-          //@ts-ignore
-          setError(tracksError.message);
-          setIsLoading(false);
-          return;
-        }
-        
-        // Fetch ArtistSubmissionsSocials data
-        const { data: socialsData, error: socialsError } = await supabase
-          .from('ArtistSubmissionsSocials')
-          .select('*')
-          .eq('artistSubmissionId', artist as string)
-          .single();
+    const { data: artistData, error: artistError } = await supabase
+      .from("ArtistSubmissions")
+      .select("*")
+      .eq("uid", artist as string)
+      .single();
 
-        if (socialsError) {
-          console.error('Error fetching ArtistSubmissionsSocials:', socialsError);
-        } else {
-          artistData.ArtistSubmissionsSocials = socialsData;
-        }
-    
-        console.log(artistData);
-        setArtistSubmission(artistData);
-        console.log(tracksData);
-        //@ts-ignore
-        setTracks(tracksData);
-        setIsLoading(false);
-      };
-  
-    useEffect(() => {
-      getUserData();
+    if (artistError) {
+      //@ts-ignore
+      setError(artistError.message);
+      setIsLoading(false);
+      return;
+    }
 
-      window.tracks = {};
-      window.trackPeaks = {};
-      window.trackDurations = {};
-      setRendered(true);
-    }, []);
-  
-    if (isLoading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
-  
-    return (
-      <>
-        <Head>
-          <title>Stems - Music Creating Platform</title>
-          <meta
-            property="og:title"
-            content={`Send a beat directly on Stems`}
-          />
-          <meta
-            name="description"
-            content={`Stems connects artists worldwide by facilitating collaboration with producers and fans. Submit your beats directly to artists and let fans vote on their favorite submissions`}
-          />
-          <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <meta
-            property="og:image"
-            content={
-            //   artistSubmission.ArtistSubmissionsSocials?.imageUrl ||
-              "https://0xstems.xyz/assets/og-image.png"
-            }
-          />
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
-        {rendered && artistSubmission && !isLoading && (
-            //ADDED TRACKS - passing tracks to the provider
-          <MusicPlayerProvider id={artist as string} isArtistSubmissions tracks={tracks || []}>
-            <>
-              <Banner artistName={artistSubmission.name} />
-              <Header
-                id={artist as string}
-                name={artistSubmission.name}
-                description={artistSubmission.description}
-                socials={artistSubmission.ArtistSubmissionsSocials}
-                bio={artistSubmission.bio}
-                imageUrl={artistSubmission.ArtistSubmissionsSocials?.imageUrl}
-              />
-              <Tracks tracks={tracks || []} />
-              {/* <Tracks /> */}
-              <TestPlayerNew />
-            </>
-          </MusicPlayerProvider>
-        )}
-      </>
-    );
+    const { data: tracksData, error: tracksError } = await supabase
+      .from("Track")
+      .select("*")
+      .eq("artistSubmissionId", artist as string);
+
+    if (tracksError) {
+      //@ts-ignore
+      setError(tracksError.message);
+      setIsLoading(false);
+      return;
+    }
+
+    // Fetch ArtistSubmissionsSocials data
+    const { data: socialsData, error: socialsError } = await supabase
+      .from("ArtistSubmissionsSocials")
+      .select("*")
+      .eq("artistSubmissionId", artist as string)
+      .single();
+
+    if (socialsError) {
+      console.error("Error fetching ArtistSubmissionsSocials:", socialsError);
+    } else {
+      artistData.ArtistSubmissionsSocials = socialsData;
+    }
+
+    console.log(artistData);
+    setArtistSubmission(artistData);
+    console.log(tracksData);
+    //@ts-ignore
+    setTracks(tracksData);
+    setIsLoading(false);
   };
+
+  useEffect(() => {
+    getUserData();
+
+    window.tracks = {};
+    window.trackPeaks = {};
+    window.trackDurations = {};
+    setRendered(true);
+  }, []);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  console.log({ artistSubmission });
+
+  return (
+    <div>
+      <Head>
+        <title>{artistSubmission?.name || 'Stems'} - Music Creating Platform</title>
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${process.env.NEXT_PUBLIC_SITE_URL}/${artist}`} />
+        <meta 
+          property="og:title" 
+          content={`${artistSubmission?.name || 'Artist'} on Stems - Send Beats Directly`} 
+        />
+        <meta
+          property="og:description"
+          content={artistSubmission?.description || `Submit your beats directly to ${artistSubmission?.name || 'the artist'} and let fans vote on their favorite submissions. Join Stems, the music creation platform connecting artists worldwide.`}
+        />
+        <meta
+          property="og:image"
+          content={
+            artistSubmission?.ArtistSubmissionsSocials?.imageUrl ||
+            "https://0xstems.xyz/assets/og-image.png"
+          }
+        />
+
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={`${process.env.NEXT_PUBLIC_SITE_URL}/${artist}`} />
+        <meta 
+          property="twitter:title" 
+          content={`${artistSubmission?.name || 'Artist'} on Stems - Send Beats Directly`} 
+        />
+        <meta
+          property="twitter:description"
+          content={artistSubmission?.description || `Submit your beats directly to ${artistSubmission?.name || 'the artist'} and let fans vote on their favorite submissions. Join Stems, the music creation platform connecting artists worldwide.`}
+        />
+        <meta
+          property="twitter:image"
+          content={
+            artistSubmission?.ArtistSubmissionsSocials?.imageUrl ||
+            "https://0xstems.xyz/assets/og-image.png"
+          }
+        />
+
+        {/* Additional Meta Tags */}
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      {rendered && artistSubmission && !isLoading && (
+        //ADDED TRACKS - passing tracks to the provider
+        <MusicPlayerProvider
+          id={artist as string}
+          isArtistSubmissions
+          tracks={tracks || []}
+        >
+          <>
+            <Banner artistName={artistSubmission.name} />
+            <Header
+              id={artist as string}
+              name={artistSubmission.name}
+              description={artistSubmission.description}
+              socials={{
+                imageUrl: artistSubmission.ArtistSubmissionsSocials?.imageUrl || null,
+                spotifyUrl: artistSubmission.ArtistSubmissionsSocials?.spotifyUrl || null,
+                twitterUrl: artistSubmission.ArtistSubmissionsSocials?.twitterUrl || null,
+                instagramUrl: artistSubmission.ArtistSubmissionsSocials?.instagramUrl || null,
+                geniusUrl: artistSubmission.ArtistSubmissionsSocials?.geniusUrl || null
+              }}
+              bio={artistSubmission.bio}
+            />
+            <Tracks tracks={tracks || []} />
+            {/* <Tracks /> */}
+            <TestPlayerNew />
+          </>
+        </MusicPlayerProvider>
+      )}
+    </div>
+  );
+};
 
 export default Home;
 
@@ -1197,4 +1246,3 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   };
 };
-
